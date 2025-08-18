@@ -32,7 +32,8 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Uncomment to register a new dependency of your gem
+  spec.add_runtime_dependency "rake", "~> 13.3"
+
   spec.add_development_dependency "rspec", "~> 3.13"
   spec.add_development_dependency "pry", "~> 0.15"
 end
