@@ -1,9 +1,14 @@
-class Tailscale
+module Tailscale
   class << self
     def status
       Tailscale::Status.as_json
+    rescue StandardError => e
+      # TODO: check for tailscale being installed
+      #   Raise the appropriate error for the Tailscale specific error
+      #   else
+      #   Raise the appropriate error if tailscale is not installed
     end
-    #
+
     # def device(device_name)
     #   Tailscale::Device.find_by_name(device_name)
     # end
