@@ -33,7 +33,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "rake", "~> 13.3"
+  # https://github.com/thoughtbot/terrapin
+  spec.add_runtime_dependency "terrapin", "~> 1.1"
 
-  spec.add_development_dependency "rspec", "~> 3.13"
+  # spec.add_development_dependency "rspec", "~> 3.13"
   spec.add_development_dependency "pry", "~> 0.15"
 end

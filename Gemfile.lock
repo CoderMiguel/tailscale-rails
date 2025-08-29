@@ -1,0 +1,30 @@
+PATH
+  remote: .
+  specs:
+    tailscale-rails (0.1.0)
+      rake (~> 13.3)
+      terrapin (~> 1.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    climate_control (1.2.0)
+    coderay (1.1.3)
+    method_source (1.1.0)
+    pry (0.15.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    rake (13.3.0)
+    terrapin (1.1.1)
+      climate_control
+
+PLATFORMS
+  arm64-darwin-22
+  ruby
+
+DEPENDENCIES
+  pry (~> 0.15)
+  tailscale-rails!
+
+BUNDLED WITH
+   2.7.1
