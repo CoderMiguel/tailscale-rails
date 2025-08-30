@@ -33,7 +33,7 @@ Documentation
 
     class << self
       def as_json
-        JSON.parse(new(flags: "--json").standard_output)
+        new(flags: "--json").as_json
       end
 
       def handle_exit_status(error:, cli: nil, **options)
@@ -44,10 +44,8 @@ Documentation
           # failed to connect to local tailscaled; it doesn't appear to be running
           Tailscale::Daemon.new if restart_tailscale_daemon?
 
-          if Tailscale::Status.needs_login?
-            # TODO:
-            binding.pry
-          end
+          # TODO: consider logging that tailscaled was not running and we started it
+          super unless cli.rerun_command.success?
         else
           super
         end
@@ -56,7 +54,7 @@ Documentation
       def backend_state_inquiry
         as_json["BackendState"].snake_case.inquiry
       end
-      delegate(*%i[needs_login?], to: :backend_state_inquiry)
+      delegate(*%i[needs_login? no_state? running? stopped?], to: :backend_state_inquiry)
 
       private(*%i[backend_state_inquiry])
 
@@ -87,8 +85,10 @@ Documentation
       # alias backend_state status_attribute
     end
 
-    # def needs_login?
-    #   self.class.as_json["BackendState"] == "NeedsLogin"
-    # end
+    def as_json
+      JSON.parse(standard_output)
+    rescue JSON::ParserError => e
+      unhandled(error: e)
+    end
   end
 end

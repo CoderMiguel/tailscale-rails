@@ -1,10 +1,13 @@
 require_relative "../rails.rb"
+require_relative "../../cli/cli.rb"
 require_relative "../../tailscale.rb"
 
 module Tailscale
   module Rails
     class Railtie < ::Rails::Railtie
-      # TODO: config.eager_load_namespaces << Tailscale
+      [::CLI, Tailscale].each do |namespace|
+        config.eager_load_namespaces << namespace
+      end
 
       initializer "your_gem.configure_defaults" do |_app|
         ::Rails.application.config.eager_load = true
@@ -14,8 +17,11 @@ module Tailscale
       end
 
       console do
+        # Tailscale::Device.all_devices
         # Tailscale::Daemon.new
         # Maybe add helper methods to console
+
+        at_exit { Tailscale.try(:down) }
       end
 
       # server do

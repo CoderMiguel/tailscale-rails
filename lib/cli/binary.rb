@@ -22,6 +22,7 @@ module CLI
       end
 
       def unhandled(error:, **_options)
+        # TODO: consider wrapping as a Tailscale::Error with better formatting
         puts "Unhandled Error from: #{error.backtrace[1]}"
         raise error
       end
@@ -30,7 +31,8 @@ module CLI
 
       def handle_terrapin(error:, **options)
         case error
-        when ::Terrapin::ExitStatusError      then handle_exit_status(error:, **options)
+        when ::Terrapin::ExitStatusError     # then
+          handle_exit_status(error:, **options)
         # when ::Terrapin::CommandNotFoundError then handle_command_not_found(cli:, error:, **options)
         else unhandled(error:)
         end
@@ -57,11 +59,18 @@ module CLI
       @flags = options.fetch(:flags, nil)
       @subcommand = options.fetch(:subcommand, self.class.subcommand)
       super(binary, ":subcommand :flags", shell: true).tap do
-        # binding.pry if is_a? Tailscale::Up
         run(flags:, subcommand:)
       end
     rescue *TERRAPIN_ERRORS => e then handle_terrapin(cli: self, error: e)
     rescue StandardError => e    then unhandled(error: e)
+    end
+
+    def rerun_command
+      tap { run(flags:, subcommand:) }
+    end
+
+    def run_as_detached_process
+      Process.spawn(command_string).tap { |pid| Process.detach(pid) }
     end
 
     def standard_error

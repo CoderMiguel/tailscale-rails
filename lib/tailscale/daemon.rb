@@ -52,15 +52,18 @@ module Tailscale
       # TODO: make these configurable
       @flags = "--tun=userspace-networking --socks5-server=localhost:1055"
 
-      Process.spawn(command_string).tap do |pid|
-        @pid = pid
-        Process.detach(pid) if options.fetch(:detached, true)
-        Tailscale.up if Tailscale::Status.needs_login?
-      end
+      run_as_detached_process
+      sleep 0.25 while daemon_starting_up?
+      Tailscale.up
     end
 
     def command_string
       self.class.cli_instance.command(flags:).gsub(/'/, "")
     end
+
+    private
+
+    delegate(*%i[no_state?], to: Tailscale::Status)
+    alias daemon_starting_up? no_state?
   end
 end

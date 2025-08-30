@@ -1,47 +1,35 @@
 # frozen_string_literal: true
 
-require "terrapin"
-require_relative "./rails/railtie" if defined?(Rails)
+if defined?(Rails)
+  require "terrapin"
 
-# gem_lib_dir = File.join("..", File.dirname(File.dirname(__FILE__)))
-# gem_lib_files = ["**", nil].flat_map { |sub_dirs| Dir[File.join(gem_lib_dir, *[sub_dirs, "*.rb"].compact)] }
-#
-# gem_files_to_require = gem_lib_files.reject do |path|
-#   path == __FILE__ || (path =~ /railtie/ unless defined?(Rails::Railtie))
-# end
-#
-# sorted_gem_files_to_require = gem_files_to_require.sort_by do |file_path|
-#   case file_path
-#   when /\/cli\// then 0
-#   when /\/refinements\// then 1
-#   when /command.rb/ then 2
-#   when /\/rails\// then file_path =~ /logging/ ? 3 : 4
-#   else 5
-#   end
-# end
-#
-# sorted_gem_files_to_require.each do |file|
-#   # puts "requiring: #{file}"
-#   require file
-# end
+  require_relative "./rails/refinements/string/snake_case"
+  require_relative "./rails/railtie"
+  require_relative "./command"
+  require_relative "./commands/down"
+  require_relative "./commands/status"
+  require_relative "./commands/up"
 
-# TODO: build a generator to install the Tailscale binary
+  # TODO: build a generator to install the Tailscale binary
 
-module Tailscale
-  module Rails
-    extend ActiveSupport::Concern
-    extend ActiveSupport::Autoload
+  module Tailscale
+    module Rails
+      # extend ActiveSupport::Concern
+      extend ActiveSupport::Autoload
 
-    class_methods do
+      attr_reader(*%i[configuration])
+      module_function :configuration
+
+      module_function
+
       def eager_load!
-        binding.pry
+        @configuration = Tailscale::Configuration.new
+        autoload :Down
+        autoload :Status
+        autoload :Up
         # ConfigurationHelpers.eager_load!
         # Configuration.eager_load!
       end
-    end
-
-    class << self
-      include ClassMethods
     end
   end
 end
